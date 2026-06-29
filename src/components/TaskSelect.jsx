@@ -11,7 +11,6 @@ const TASKS = {
 }
 
 export default function TaskSelect({ platform, onSelectTask, onBack }) {
-  const [hov, setHov] = useState(false)
   const t = TASKS[platform] || TASKS.govuk
 
   return (
@@ -36,12 +35,12 @@ export default function TaskSelect({ platform, onSelectTask, onBack }) {
 
         {/* Wider card matching light mode proportions */}
         <motion.div
-          initial={{ opacity:0, y:24 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.25 }}
+          initial={{ opacity:0, y:24 }}
+          animate={{ opacity:1, y:0 }}
+          transition={{ delay:0.25 }}
           onClick={onSelectTask}
-          onHoverStart={() => setHov(true)} onHoverEnd={() => setHov(false)}
-          animate={{ y: hov ? -6 : 0, boxShadow: hov ? `0 16px 48px rgba(245,158,11,0.22), 0 0 0 1.5px #f59e0b` : '0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.07)' }}
-          transition={{ duration:0.22 }}
-          style={{ background:'#0f172a', borderRadius:20, overflow:'hidden', cursor:'pointer', width:'100%' }}>
+          whileHover={{ y:-6, boxShadow:'0 16px 48px rgba(245,158,11,0.22), 0 0 0 1.5px #f59e0b' }}
+          style={{ background:'#0f172a', borderRadius:20, overflow:'hidden', cursor:'pointer', width:'100%', boxShadow:'0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.07)' }}>
 
           <div style={{ background:t.headerBg, padding:'22px 28px', display:'flex', alignItems:'center', gap:14 }}>
             <svg width="28" height="22" viewBox="0 0 104 80" fill="white"><path d="M52 4 L36 32 L12 18 L18 46 L86 46 L92 18 L68 32 Z"/><rect x="14" y="50" width="76" height="10" rx="2"/><rect x="10" y="64" width="84" height="16" rx="3"/></svg>

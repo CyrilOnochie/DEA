@@ -61,13 +61,12 @@ export default function PlatformSelect({ onSelect, onBack }) {
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:'clamp(12px,2.5vw,20px)' }}>
           {PLATFORMS.map((p, i) => (
             <motion.div key={p.key}
-              initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ delay:0.25 + i * 0.07 }}
+              initial={{ opacity:0, y:20 }}
+              animate={{ opacity:1, y:0 }}
+              transition={{ delay:0.25 + i * 0.07 }}
               onClick={() => clickable(p) && onSelect(p.key)}
-              onHoverStart={() => clickable(p) && setHov(p.key)}
-              onHoverEnd={() => setHov(null)}
-              animate={{ y: hov===p.key ? -5 : 0, boxShadow: hov===p.key ? `0 12px 36px rgba(245,158,11,0.18), 0 0 0 1.5px #f59e0b` : '0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)' }}
-              transition={{ duration:0.2 }}
-              style={{ background:'#0f172a', borderRadius:16, overflow:'hidden', cursor: clickable(p) ? 'pointer' : 'default', opacity: clickable(p) ? 1 : 0.55 }}>
+              whileHover={clickable(p) ? { y:-5, boxShadow:'0 12px 36px rgba(245,158,11,0.18), 0 0 0 1.5px #f59e0b' } : {}}
+              style={{ background:'#0f172a', borderRadius:16, overflow:'hidden', cursor: clickable(p) ? 'pointer' : 'default', opacity: clickable(p) ? 1 : 0.55, boxShadow:'0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.06)' }}>
               <div style={{ background:p.headerBg, padding:'18px 20px 14px', display:'flex', flexDirection:'column', gap:8 }}>
                 <StatusBadge status={p.status} />
                 <p style={{ fontFamily:F.d, fontWeight:900, fontSize:'clamp(1.2rem,2.5vw,1.5rem)', color:'#ffffff', margin:0 }}>{p.name}</p>
