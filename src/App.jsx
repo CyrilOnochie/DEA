@@ -114,12 +114,22 @@ export default function App() {
   if (screen === 'intro') return <Landing onGetStarted={() => setScreen('signup')} />
   if (screen === 'signup') return <SignUp onComplete={handleSignUpComplete} />
 
+  // Contextual back navigation — lives in App.jsx as the single source of truth,
+  // rendered by AppShell so it never collides with the sidebar.
+  const backMap = {
+    'shell-platform-select': 'shell-audit-type',
+    'shell-task-select': 'shell-platform-select',
+    'shell-nhs-dev': 'shell-platform-select',
+  }
+  const showBack = Object.prototype.hasOwnProperty.call(backMap, screen)
+  const handleBack = () => { if (backMap[screen]) setScreen(backMap[screen]) }
+
   const shellContent = () => {
     switch (screen) {
       case 'shell-audit-type':
-        return <AuditTypeSelect onSelect={() => setScreen('shell-platform-select')} onBack={() => setScreen('shell-audit-type')} />
+        return <AuditTypeSelect onSelect={() => setScreen('shell-platform-select')} />
       case 'shell-platform-select':
-        return <PlatformSelect onSelect={k => { setSelectedPlatform(k); setScreen('shell-task-select') }} onBack={() => setScreen('shell-audit-type')} />
+        return <PlatformSelect onSelect={k => { setSelectedPlatform(k); setScreen('shell-task-select') }} />
       case 'shell-task-select':
         return <TaskSelect platform={selectedPlatform} onSelectTask={() => {
           if (selectedPlatform === 'govuk') {
@@ -128,9 +138,9 @@ export default function App() {
           } else {
             setScreen('shell-nhs-dev')
           }
-        }} onBack={() => setScreen('shell-platform-select')} />
+        }} />
       case 'shell-nhs-dev':
-        return <NhsDevScreen onBack={() => setScreen('shell-platform-select')} />
+        return <NhsDevScreen />
       case 'shell-pre-report':
         return <PreReportScreen onViewReport={() => setScreen('shell-report')} />
       case 'shell-report':
@@ -159,11 +169,13 @@ export default function App() {
 
   return (
     <AppShell
-      userName={userName || 'there'}
+      userName={userName || 'Cyril'}
       recentAudits={recentAudits}
       onNewAudit={() => setScreen('shell-audit-type')}
       onSelectTab={(tab) => setScreen(tab === 'new-audit' ? 'shell-audit-type' : 'shell-usability-testing')}
       onOpenAudit={handleOpenPastAudit}
+      showBack={showBack}
+      onBack={handleBack}
     >
       {shellContent()}
     </AppShell>

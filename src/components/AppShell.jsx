@@ -1,17 +1,20 @@
 // AppShell.jsx — Claude-style collapsible sidebar wrapping the whole authenticated app.
-// "Cuddy" branding, New Audit / Usability Testing tabs, Recent Audits list,
-// footer with user's first name + Dan headshot avatar.
+// "Cuddy" branding, New Audit / Usability Testing Hub tabs, Recent Audits list,
+// footer with user's first name + grey user icon avatar.
+// Contextual back arrow rendered here, fixed at sidebarWidth + 10px, so it
+// never overlaps the sidebar regardless of collapsed/expanded state.
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 const F = { d:"'Syne',sans-serif", b:"'DM Sans',sans-serif" }
 
 function NewAuditIcon() {
   return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
 }
-function UsabilityIcon() {
-  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg>
+function UsabilityHubIcon() {
+  // Folder icon
+  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/></svg>
 }
 function CollapseIcon({ collapsed }) {
   return (
@@ -20,8 +23,18 @@ function CollapseIcon({ collapsed }) {
     </svg>
   )
 }
+function UserIcon() {
+  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+}
+function BackArrowIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M11 18l-6-6 6-6"/>
+    </svg>
+  )
+}
 
-export default function AppShell({ userName, recentAudits, onNewAudit, onSelectTab, onOpenAudit, children }) {
+export default function AppShell({ userName, recentAudits, onNewAudit, onSelectTab, onOpenAudit, showBack, onBack, children }) {
   const [collapsed, setCollapsed] = useState(false)
   const [activeTab, setActiveTab] = useState('new-audit')
 
@@ -33,7 +46,7 @@ export default function AppShell({ userName, recentAudits, onNewAudit, onSelectT
   const sidebarWidth = collapsed ? 64 : 252
 
   return (
-    <div style={{ display:'flex', width:'100%', minHeight:'100vh', background:'#0f172a' }}>
+    <div style={{ display:'flex', width:'100%', minHeight:'100vh', background:'#0f172a', position:'relative' }}>
 
       {/* Sidebar */}
       <motion.div animate={{ width: sidebarWidth }} transition={{ duration:0.25, ease:[0.16,1,0.3,1] }}
@@ -71,8 +84,8 @@ export default function AppShell({ userName, recentAudits, onNewAudit, onSelectT
               border:'none', borderRadius:8, cursor:'pointer', width:'100%',
               color: activeTab==='usability-testing' ? '#f59e0b' : '#9ca3af',
             }}>
-            <UsabilityIcon />
-            {!collapsed && <span style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.88rem' }}>Usability Testing</span>}
+            <UsabilityHubIcon />
+            {!collapsed && <span style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.88rem' }}>Usability Testing Hub</span>}
           </button>
         </div>
 
@@ -107,8 +120,8 @@ export default function AppShell({ userName, recentAudits, onNewAudit, onSelectT
 
         {/* Footer — user */}
         <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', padding: collapsed ? '14px 0' : '14px 16px', display:'flex', alignItems:'center', gap:10, justifyContent: collapsed ? 'center' : 'flex-start', flexShrink:0 }}>
-          <div style={{ width:32, height:32, borderRadius:'50%', overflow:'hidden', flexShrink:0, background:'#1e293b', display:'flex', alignItems:'flex-end', justifyContent:'center' }}>
-            <img src="/assets/dan.png" alt={userName} style={{ width:'140%', height:'140%', objectFit:'cover', objectPosition:'top center' }} onError={e => e.target.style.visibility='hidden'} />
+          <div style={{ width:32, height:32, borderRadius:'50%', flexShrink:0, background:'#1e293b', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <UserIcon />
           </div>
           {!collapsed && (
             <div style={{ minWidth:0 }}>
@@ -118,6 +131,24 @@ export default function AppShell({ userName, recentAudits, onNewAudit, onSelectT
           )}
         </div>
       </motion.div>
+
+      {/* Contextual back arrow — fixed at sidebarWidth + 10px, follows collapse state */}
+      {showBack && (
+        <motion.button
+          onClick={onBack}
+          animate={{ left: sidebarWidth + 10 }}
+          transition={{ duration:0.25, ease:[0.16,1,0.3,1] }}
+          whileHover={{ background:'rgba(255,255,255,0.06)' }}
+          style={{
+            position:'fixed', top:20, zIndex:40,
+            width:36, height:36, borderRadius:8,
+            background:'transparent', border:'1px solid rgba(255,255,255,0.1)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer',
+          }}>
+          <BackArrowIcon />
+        </motion.button>
+      )}
 
       {/* Main content */}
       <div style={{ flex:1, minWidth:0, position:'relative' }}>

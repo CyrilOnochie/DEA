@@ -52,16 +52,11 @@ const TYPES = [
   },
 ]
 
-export default function AuditTypeSelect({ onSelect, onBack }) {
+export default function AuditTypeSelect({ onSelect }) {
   return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 24px', backgroundColor:'#0f172a', position:'relative', overflow:'hidden' }}>
       <ParticleCanvas />
       <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 20%, #0f172a 95%)', pointerEvents:'none', zIndex:1 }} />
-
-      <motion.button initial={{ opacity:0 }} animate={{ opacity:1 }} transition={{ delay:0.2 }} onClick={onBack}
-        style={{ position:'fixed', top:20, left:20, zIndex:30, background:'transparent', border:'1px solid rgba(255,255,255,0.15)', borderRadius:8, padding:'9px 16px', color:'#e5e7eb', fontFamily:F.b, fontSize:'0.9rem', cursor:'pointer' }}>
-        ← Back
-      </motion.button>
 
       <div style={{ position:'relative', zIndex:2, maxWidth:860, width:'100%' }}>
         <motion.p initial={{ opacity:0 }} animate={{ opacity:1 }}

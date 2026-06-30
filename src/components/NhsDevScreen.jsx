@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import ParticleCanvas from './ParticleCanvas'
 const F = { d:"'Syne',sans-serif", b:"'DM Sans',sans-serif" }
-export default function NhsDevScreen({ onBack }) {
+export default function NhsDevScreen() {
   return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', backgroundColor:'#0f172a', position:'relative', overflow:'hidden', padding:40 }}>
       <ParticleCanvas />
@@ -11,7 +11,6 @@ export default function NhsDevScreen({ onBack }) {
         </div>
         <h1 style={{ fontFamily:F.d, fontWeight:900, fontSize:'2rem', color:'#ffffff', margin:'0 0 12px' }}>Still in development</h1>
         <p style={{ fontFamily:F.b, fontSize:'1rem', color:'#9ca3af', lineHeight:1.6, marginBottom:28 }}>The NHS App audit follows the same methodology as the GOV.UK journey. The audit database for this platform is being built — check back soon.</p>
-        <button onClick={onBack} style={{ padding:'12px 28px', background:'transparent', border:'1px solid rgba(255,255,255,0.15)', borderRadius:9999, fontFamily:F.b, fontSize:'0.9rem', color:'#e5e7eb', cursor:'pointer' }}>← Choose a different platform</button>
       </div>
     </div>
   )
