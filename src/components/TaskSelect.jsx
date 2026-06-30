@@ -1,5 +1,5 @@
-// TaskSelect.jsx — wider card matching light mode style, heading is "Select a task"
-import { useState } from 'react'
+// TaskSelect — wider card, "Select a task" heading. No hov state.
+
 import { motion } from 'framer-motion'
 import ParticleCanvas from './ParticleCanvas'
 
@@ -33,14 +33,17 @@ export default function TaskSelect({ platform, onSelectTask, onBack }) {
           Select a task
         </motion.h1>
 
-        {/* Wider card matching light mode proportions */}
         <motion.div
           initial={{ opacity:0, y:24 }}
           animate={{ opacity:1, y:0 }}
           transition={{ delay:0.25 }}
           onClick={onSelectTask}
-          whileHover={{ y:-6, boxShadow:'0 16px 48px rgba(245,158,11,0.22), 0 0 0 1.5px #f59e0b' }}
-          style={{ background:'#0f172a', borderRadius:20, overflow:'hidden', cursor:'pointer', width:'100%', boxShadow:'0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.07)' }}>
+          whileHover={{ y:-6, boxShadow:`0 16px 48px rgba(245,158,11,0.22), 0 0 0 1.5px #f59e0b` }}
+          style={{
+            background:'#0f172a', borderRadius:20, overflow:'hidden',
+            cursor:'pointer', width:'100%',
+            boxShadow:'0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.07)',
+          }}>
 
           <div style={{ background:t.headerBg, padding:'22px 28px', display:'flex', alignItems:'center', gap:14 }}>
             <svg width="28" height="22" viewBox="0 0 104 80" fill="white"><path d="M52 4 L36 32 L12 18 L18 46 L86 46 L92 18 L68 32 Z"/><rect x="14" y="50" width="76" height="10" rx="2"/><rect x="10" y="64" width="84" height="16" rx="3"/></svg>
@@ -49,17 +52,14 @@ export default function TaskSelect({ platform, onSelectTask, onBack }) {
 
           <div style={{ padding:'clamp(22px,4vw,32px)' }}>
             <p style={{ fontFamily:F.d, fontWeight:900, fontSize:'clamp(1.4rem,3.5vw,2rem)', color:'#ffffff', margin:'0 0 20px', lineHeight:1.2 }}>{t.taskName}</p>
-
             <div style={{ borderRadius:14, border:`1px solid ${t.accent}44`, background:`${t.accent}0e`, padding:'18px 20px', marginBottom:20 }}>
               <p style={{ fontFamily:F.d, fontWeight:900, fontSize:'clamp(1.8rem,4vw,2.4rem)', color:t.accent, margin:'0 0 6px', lineHeight:1 }}>{t.stat}</p>
               <p style={{ fontFamily:F.b, fontSize:'0.88rem', color:'#d1d5db', margin:'0 0 6px', lineHeight:1.55 }}>{t.statCaption}</p>
               <p style={{ fontFamily:F.b, fontSize:'0.72rem', color:'#6b7280', margin:0, fontStyle:'italic' }}>{t.source}</p>
             </div>
-
-            <motion.p animate={{ color: hov ? '#f59e0b' : '#4b5563' }} transition={{ duration:0.2 }}
-              style={{ fontFamily:F.d, fontWeight:700, fontSize:'0.88rem', letterSpacing:'0.06em', textTransform:'uppercase' }}>
+            <p style={{ fontFamily:F.d, fontWeight:700, fontSize:'0.88rem', letterSpacing:'0.06em', textTransform:'uppercase', color:'#4b5563' }}>
               Begin audit →
-            </motion.p>
+            </p>
           </div>
         </motion.div>
       </div>
