@@ -21,8 +21,10 @@ function SmallReqIcon({ icon }) {
   const Icon = ICON_MAP[icon]
   if (!Icon) return null
   return (
-    <div style={{ transform:'scale(0.55)', transformOrigin:'top center', width:56, height:56, flexShrink:0 }}>
-      <Icon />
+    <div style={{ width:56, height:56, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ transform:'scale(0.55)', transformOrigin:'center center', width:96, height:96, display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <Icon />
+      </div>
     </div>
   )
 }
@@ -107,7 +109,7 @@ export default function StepBlock({ stepData, isActive, isCompleted, status, onP
                 </div>
               )}
               {status==='skipped' && (
-                <button onClick={onIncludeRetro}
+                <button onClick={onIncludeRetro} className="pulse-btn"
                   style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'5px 14px', background:'rgba(245,158,11,0.08)', border:'1px solid rgba(245,158,11,0.25)', borderRadius:9999, cursor:'pointer' }}>
                   <span style={{ fontFamily:F.d, fontWeight:700, fontSize:'0.7rem', color:'#f59e0b', letterSpacing:'0.06em', textTransform:'uppercase' }}>Include in usability testing →</span>
                 </button>
@@ -125,14 +127,14 @@ export default function StepBlock({ stepData, isActive, isCompleted, status, onP
                 </p>
                 <div style={{ display:'flex', gap:16, flexWrap:'wrap', alignItems:'flex-start', marginBottom:12 }}>
                   {stepData.requirements.map(r => (
-                    <div key={r.id} style={{ display:'flex', flexDirection:'column', alignItems:'center', maxWidth:70 }}>
+                    <div key={r.id} style={{ display:'flex', flexDirection:'column', alignItems:'center', width:80 }}>
                       <SmallReqIcon icon={r.icon} />
-                      <p style={{ fontFamily:F.b, fontSize:'0.62rem', color:'#6b7280', textAlign:'center', margin:'2px 0 0', lineHeight:1.3 }}>{r.caption}</p>
+                      <p style={{ fontFamily:F.b, fontSize:'0.62rem', color:'#6b7280', textAlign:'center', margin:'4px 0 0', lineHeight:1.3, width:'100%' }}>{r.caption}</p>
                     </div>
                   ))}
                 </div>
                 <p style={{ fontFamily:F.b, fontWeight:500, fontSize:'0.85rem', color:'#9ca3af', margin:'0 0 16px' }}>
-                  — created exclusion for <strong style={{ color:'#e5e7eb', fontWeight:700 }}>{flaggedCount} user {flaggedCount===1?'group':'groups'}</strong>
+                  The requirement above creates exclusion for <strong style={{ color:'#e5e7eb', fontWeight:700 }}>{flaggedCount} user {flaggedCount===1?'group':'groups'}</strong>
                 </p>
 
                 {/* Personas — wide row layout: avatar LEFT, name+bio+represents RIGHT */}
