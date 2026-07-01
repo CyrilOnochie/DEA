@@ -45,6 +45,107 @@ function StatusDropdown({ value, onChange }) {
   )
 }
 
+// Groups inclusion records by personaKey, returns entries array
+function groupByPersona(records) {
+  const map = {}
+  records.forEach(rec => {
+    if (!map[rec.personaKey]) map[rec.personaKey] = []
+    map[rec.personaKey].push(rec)
+  })
+  return Object.entries(map)
+}
+
+// One row per persona — own component so useState (expand) is valid per React hooks rules
+function TrackerRow({ personaKey, recs, index, auditId, onUpdateStatus }) {
+  const [expanded, setExpanded] = useState(false)
+  const p = CHARACTERS[personaKey]
+  if (!p) return null
+  const reportPersona = REPORT.personas.find(rp => rp.key === personaKey)
+  const contact = reportPersona?.recruitment?.contacts?.[0]
+  const sharedStatus = recs[0].status
+
+  return (
+    <div style={{ borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
+      <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:index*0.05 }}
+        style={{ display:'grid', gridTemplateColumns:'2.4fr 1.2fr 2fr 1.6fr', gap:16, alignItems:'center', padding:'14px 16px' }}>
+
+        {/* User + why trigger */}
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <div style={{ width:42, height:64, flexShrink:0 }}>
+            <img src={p.image} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'contain', objectPosition:'bottom' }} />
+          </div>
+          <div>
+            <p style={{ fontFamily:F.d, fontWeight:800, fontSize:'0.92rem', color:'#ffffff', margin:'0 0 2px' }}>{p.name}</p>
+            <p style={{ fontFamily:F.b, fontSize:'0.74rem', color:'#9ca3af', margin:'0 0 6px', lineHeight:1.4 }}>
+              Represents {p.persona.toLowerCase()}
+            </p>
+            {reportPersona?.whyInclude && (
+              <button onClick={() => setExpanded(e => !e)}
+                style={{ background:'transparent', border:'none', padding:0, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                <span style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.72rem', color:'#60a5fa' }}>
+                  Why include {p.name}?
+                </span>
+                <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration:0.2 }}
+                  style={{ display:'flex', alignItems:'center', color:'#60a5fa' }}>
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                    <path d="M2 4l4 4 4-4"/>
+                  </svg>
+                </motion.span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Exclusion step pills — coloured by severity */}
+        <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+          {recs.sort((a,b) => a.step - b.step).map(rec => {
+            const sc = SEVERITY_COLOURS[rec.severity] || SEVERITY_COLOURS.soft
+            return (
+              <span key={rec.step} style={{ display:'inline-block', padding:'4px 9px', background:sc.bg, border:`1px solid ${sc.border}`, borderRadius:9999, fontFamily:F.b, fontWeight:700, fontSize:'0.7rem', color:sc.text }}>
+                S{rec.step}
+              </span>
+            )
+          })}
+        </div>
+
+        {/* Contact */}
+        <div>
+          {contact ? (
+            <>
+              <p style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.78rem', color:'#e5e7eb', margin:'0 0 1px' }}>{contact.org}</p>
+              <p style={{ fontFamily:F.b, fontSize:'0.7rem', color:'#6b7280', margin:0 }}>{contact.detail}</p>
+            </>
+          ) : (
+            <p style={{ fontFamily:F.b, fontSize:'0.78rem', color:'#4b5563' }}>—</p>
+          )}
+        </div>
+
+        {/* Status */}
+        <div>
+          <StatusDropdown value={sharedStatus} onChange={(val) => recs.forEach(rec => onUpdateStatus(auditId, personaKey, rec.step, val))} />
+        </div>
+      </motion.div>
+
+      {/* Expandable why-include panel */}
+      <AnimatePresence>
+        {expanded && reportPersona?.whyInclude && (
+          <motion.div initial={{ opacity:0, height:0 }} animate={{ opacity:1, height:'auto' }} exit={{ opacity:0, height:0 }}
+            transition={{ duration:0.25, ease:[0.16,1,0.3,1] }} style={{ overflow:'hidden' }}>
+            <div style={{ margin:'0 16px 14px', padding:'14px 16px', background:'rgba(96,165,250,0.06)', border:'1px solid rgba(96,165,250,0.2)', borderRadius:10 }}>
+              <p style={{ fontFamily:F.b, fontWeight:700, fontSize:'0.7rem', color:'#60a5fa', letterSpacing:'0.1em', textTransform:'uppercase', margin:'0 0 6px' }}>
+                Why include {p.name} in your usability testing
+              </p>
+              <p style={{ fontFamily:F.b, fontWeight:500, fontSize:'0.85rem', color:'#e5e7eb', margin:0, lineHeight:1.6 }}>
+                {reportPersona.whyInclude}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
 export default function UsabilityTestingTab({ recentAudits, inclusions, onUpdateStatus }) {
   const [openAuditId, setOpenAuditId] = useState(null)
 
@@ -72,82 +173,36 @@ export default function UsabilityTestingTab({ recentAudits, inclusions, onUpdate
           <p style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.78rem', color:'#f59e0b', letterSpacing:'0.2em', textTransform:'uppercase', marginBottom:10 }}>
             {openAudit.platform}
           </p>
-          <h1 style={{ fontFamily:F.d, fontWeight:900, fontSize:'clamp(1.6rem,3.5vw,2.2rem)', color:'#ffffff', margin:'0 0 28px', letterSpacing:'-0.02em' }}>
+          <h1 style={{ fontFamily:F.d, fontWeight:900, fontSize:'clamp(1.6rem,3.5vw,2.2rem)', color:'#ffffff', margin:'0 0 16px', letterSpacing:'-0.02em' }}>
             {openAudit.task} — usability testing tracker
           </h1>
 
+          {/* Colour legend */}
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'center', marginBottom:28, padding:'12px 16px', background:'rgba(255,255,255,0.02)', border:'1px solid rgba(255,255,255,0.07)', borderRadius:10 }}>
+            <p style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.7rem', color:'#6b7280', letterSpacing:'0.1em', textTransform:'uppercase', margin:'0 10px 0 0' }}>Exclusion steps key:</p>
+            {[
+              { colour: SEVERITY_COLOURS.hard,       label: 'Hard stop — most urgent to address' },
+              { colour: SEVERITY_COLOURS.soft,       label: 'Friction — creates barriers, slows progress' },
+              { colour: SEVERITY_COLOURS.workaround, label: 'Workaround exists — alternative route available' },
+            ].map(({ colour, label }) => (
+              <div key={label} style={{ display:'flex', alignItems:'center', gap:7 }}>
+                <span style={{ display:'inline-block', width:12, height:12, borderRadius:'50%', background:colour.text, flexShrink:0 }} />
+                <span style={{ fontFamily:F.b, fontSize:'0.78rem', color:'#9ca3af' }}>{label}</span>
+              </div>
+            ))}
+          </div>
+
           {/* Table header */}
           <div style={{ display:'grid', gridTemplateColumns:'2.4fr 1.2fr 2fr 1.6fr', gap:16, padding:'0 16px 10px', borderBottom:'1px solid rgba(255,255,255,0.08)', marginBottom:6 }}>
-            {['User', 'Steps', 'Point of contact', 'Status'].map(h => (
+            {['User', 'Exclusion Steps', 'Point of contact', 'Status'].map(h => (
               <p key={h} style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.68rem', color:'#6b7280', letterSpacing:'0.1em', textTransform:'uppercase', margin:0 }}>{h}</p>
             ))}
           </div>
 
-          {/* Rows — one per persona, multiple step pills shown together */}
-          {(() => {
-            const byPersona = {}
-            openAudit.records.forEach(rec => {
-              if (!byPersona[rec.personaKey]) byPersona[rec.personaKey] = []
-              byPersona[rec.personaKey].push(rec)
-            })
-
-            return Object.entries(byPersona).map(([personaKey, recs], i) => {
-              const p = CHARACTERS[personaKey]
-              if (!p) return null
-              const reportPersona = REPORT.personas.find(rp => rp.key === personaKey)
-              const contact = reportPersona?.recruitment?.contacts?.[0]
-              // Status is tracked per persona for this audit (use the first record's status as the shared status)
-              const sharedStatus = recs[0].status
-
-              return (
-                <motion.div key={personaKey} initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ delay:i*0.05 }}
-                  style={{ display:'grid', gridTemplateColumns:'2.4fr 1.2fr 2fr 1.6fr', gap:16, alignItems:'center', padding:'14px 16px', borderBottom:'1px solid rgba(255,255,255,0.05)' }}>
-
-                  {/* User column */}
-                  <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                    <div style={{ width:42, height:64, flexShrink:0 }}>
-                      <img src={p.image} alt={p.name} style={{ width:'100%', height:'100%', objectFit:'contain', objectPosition:'bottom' }} />
-                    </div>
-                    <div>
-                      <p style={{ fontFamily:F.d, fontWeight:800, fontSize:'0.92rem', color:'#ffffff', margin:'0 0 2px' }}>{p.name}</p>
-                      <p style={{ fontFamily:F.b, fontSize:'0.74rem', color:'#9ca3af', margin:0, lineHeight:1.4 }}>
-                        Represents {p.persona.toLowerCase()}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Step pills — one per step flagged, coloured by severity */}
-                  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                    {recs.sort((a,b) => a.step - b.step).map(rec => {
-                      const sc = SEVERITY_COLOURS[rec.severity] || SEVERITY_COLOURS.soft
-                      return (
-                        <span key={rec.step} style={{ display:'inline-block', padding:'4px 9px', background:sc.bg, border:`1px solid ${sc.border}`, borderRadius:9999, fontFamily:F.b, fontWeight:700, fontSize:'0.7rem', color:sc.text }}>
-                          S{rec.step}
-                        </span>
-                      )
-                    })}
-                  </div>
-
-                  {/* Contact */}
-                  <div>
-                    {contact ? (
-                      <>
-                        <p style={{ fontFamily:F.b, fontWeight:600, fontSize:'0.78rem', color:'#e5e7eb', margin:'0 0 1px' }}>{contact.org}</p>
-                        <p style={{ fontFamily:F.b, fontSize:'0.7rem', color:'#6b7280', margin:0 }}>{contact.detail}</p>
-                      </>
-                    ) : (
-                      <p style={{ fontFamily:F.b, fontSize:'0.78rem', color:'#4b5563' }}>—</p>
-                    )}
-                  </div>
-
-                  {/* Status — applies to all steps for this persona in this audit */}
-                  <div>
-                    <StatusDropdown value={sharedStatus} onChange={(val) => recs.forEach(rec => onUpdateStatus(openAudit.id, personaKey, rec.step, val))} />
-                  </div>
-                </motion.div>
-              )
-            })
-          })()}
+          {/* Rows — rendered as a proper component so useState (expand) is valid */}
+          {groupByPersona(openAudit.records).map(([personaKey, recs], i) => (
+            <TrackerRow key={personaKey} personaKey={personaKey} recs={recs} index={i} auditId={openAudit.id} onUpdateStatus={onUpdateStatus} />
+          ))}
         </div>
       </div>
     )
